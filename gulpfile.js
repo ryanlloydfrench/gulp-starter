@@ -3,6 +3,7 @@ var sass = require('gulp-sass');
 var browserSync = require('browser-sync').create();
 var imagemin = require('gulp-imagemin');
 var cache = require('gulp-cache');
+var notify = require("gulp-notify");
 
 gulp.task('sass', function() {
     return gulp.src('src/scss/**/*.scss')
@@ -11,6 +12,7 @@ gulp.task('sass', function() {
         .pipe(browserSync.reload({
             stream: true
         }))
+        .pipe(notify({message: 'Compiled SCSS'}))
 });
 
 gulp.task('browserSync', function() {
