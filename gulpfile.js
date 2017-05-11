@@ -1,6 +1,8 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var browserSync = require('browser-sync').create();
+var imagemin = require('gulp-imagemin');
+var cache = require('gulp-cache');
 
 gulp.task('sass', function() {
     return gulp.src('src/scss/**/*.scss')
@@ -17,6 +19,12 @@ gulp.task('browserSync', function() {
             baseDir: 'src'
         },
     })
+})
+
+gulp.task('images', function() {
+    return gulp.src('src/images/**/*.+(png|jpg|gif|svg)')
+        .pipe(cache(imagemin()))
+        .pipe(gulp.dest('dist/images'))
 })
 
 gulp.task('watch', ['browserSync', 'sass'], function(){
