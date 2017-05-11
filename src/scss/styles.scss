@@ -1,0 +1,11 @@
+@import 'modules/test';
+@import 'modules/boom';
+
+body {
+    background-color: #56ccf2;
+    background: linear-gradient(to right, #56ccf2, #2f80ed);
+}
+
+h1 {
+    font-size: 2rem;
+}
