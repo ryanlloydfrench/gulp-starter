@@ -11,6 +11,7 @@ const concat = require('gulp-concat');
 const browsersync = require('browser-sync').create();
 const imagemin = require('gulp-imagemin');
 const newer = require('gulp-newer');
+const rev = require('gulp-rev');
 const clean = require('gulp-clean');
 const runsequence = require('run-sequence');
 const notify = require("gulp-notify");
@@ -23,6 +24,7 @@ gulp.task('css', function() {
         .pipe(cssnano())
         .pipe(rename({suffix: '.min'}))
         .pipe(sourcemaps.write('sourcemaps'))
+        .pipe(rev())
         .pipe(gulp.dest('dist/css'))
         .pipe(browsersync.reload({stream: true}))
         .pipe(notify({message: 'Compiled CSS'}))
@@ -44,6 +46,7 @@ gulp.task('js', function() {
         .pipe(concat('scripts.js'))
         .pipe(rename({suffix: '.min'}))
         .pipe(uglify())
+        .pipe(rev())
         .pipe(gulp.dest('dist/js'))
         .pipe(notify({message: 'Compiled JS'}))
 });
@@ -59,8 +62,12 @@ gulp.task('browsersync', function() {
 
 gulp.task('images', function() {
     return gulp.src('src/images/**/*.+(png|jpg|gif|svg)')
-        .pipe(newer('dist/images'))
-        .pipe(imagemin({optimizationLevel: 7, progressive: true, interlaced: true}))
+        .pipe(imagemin([
+            imagemin.gifsicle({interlaced: true}),
+            imagemin.jpegtran({progressive: true}),
+            imagemin.optipng({optimizationLevel: 3}),
+            imagemin.svgo({plugins: [{removeViewBox: true}]})
+        ]))
         .pipe(gulp.dest('dist/images'))
 })
 
