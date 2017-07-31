@@ -26,7 +26,7 @@ gulp.task('css', function() {
         .pipe(rev())
         .pipe(gulp.dest('dist/css'))
         .pipe(browsersync.reload({stream: true}))
-        .pipe(notify({message: 'Compiled CSS'}))
+        .pipe(notify({message: 'Compiled CSS', onLast: 'true'}))
 });
 
 gulp.task('html', function() {
@@ -35,7 +35,7 @@ gulp.task('html', function() {
         .pipe(htmlmin({removeComments: true,collapseWhitespace: true}))
         .pipe(gulp.dest('dist'))
         .pipe(browsersync.reload({stream: true}))
-        .pipe(notify({message: 'Compiled HTML'}))
+        .pipe(notify({message: 'Compiled HTML', onLast: 'true'}))
 });
 
 gulp.task('js', function() {
@@ -45,7 +45,7 @@ gulp.task('js', function() {
         .pipe(uglify())
         .pipe(rev())
         .pipe(gulp.dest('dist/js'))
-        .pipe(notify({message: 'Compiled JS'}))
+        .pipe(notify({message: 'Compiled JS', onLast: 'true'}))
 });
 
 gulp.task('browsersync', function() {
@@ -66,6 +66,7 @@ gulp.task('images', function() {
             imagemin.svgo({plugins: [{removeViewBox: true}]})
         ]))
         .pipe(gulp.dest('dist/images'))
+        .pipe(notify({message: 'Compiled Images', onLast: 'true'}))
 })
 
 gulp.task('clean', function() {
