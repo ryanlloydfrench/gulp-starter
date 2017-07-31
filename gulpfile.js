@@ -4,7 +4,6 @@ const sass = require('gulp-sass');
 const sourcemaps = require('gulp-sourcemaps');
 const autoprefixer = require('gulp-autoprefixer');
 const cssnano = require('gulp-cssnano');
-const jshint = require('gulp-jshint');
 const uglify = require('gulp-uglify');
 const rename = require('gulp-rename');
 const concat = require('gulp-concat');
@@ -41,8 +40,6 @@ gulp.task('html', function() {
 
 gulp.task('js', function() {
     return gulp.src('src/js/**/*.js')
-        .pipe(jshint())
-        .pipe(jshint.reporter('jshint-stylish'))
         .pipe(concat('scripts.js'))
         .pipe(rename({suffix: '.min'}))
         .pipe(uglify())
