@@ -10,6 +10,7 @@ const concat = require('gulp-concat');
 const browsersync = require('browser-sync').create();
 const imagemin = require('gulp-imagemin');
 const newer = require('gulp-newer');
+const size = require('gulp-size');
 const clean = require('gulp-clean');
 const runsequence = require('run-sequence');
 const notify = require("gulp-notify");
@@ -29,6 +30,7 @@ gulp.task('css', function() {
         .pipe(sourcemaps.write('sourcemaps'))
         .pipe(gulp.dest(path.dist + 'css'))
         .pipe(browsersync.reload({stream: true}))
+		.pipe(size({ gzip: true, showFiles: true }))
         .pipe(notify({message: 'Compiled CSS', onLast: 'true'}))
 });
 
@@ -37,6 +39,7 @@ gulp.task('html', function() {
         .pipe(htmlmin({removeComments: true,collapseWhitespace: true}))
         .pipe(gulp.dest(path.dist))
         .pipe(browsersync.reload({stream: true}))
+		.pipe(size({ gzip: true, showFiles: true }))
         .pipe(notify({message: 'Compiled HTML', onLast: 'true'}))
 });
 
@@ -46,6 +49,7 @@ gulp.task('js', function() {
         .pipe(rename({suffix: '.min'}))
         .pipe(uglify())
         .pipe(gulp.dest(path.dist + 'js'))
+		.pipe(size({ gzip: true, showFiles: true }))
         .pipe(notify({message: 'Compiled JS', onLast: 'true'}))
 });
 
@@ -75,11 +79,27 @@ gulp.task('clean', function() {
         .pipe(clean())
 })
 
+gulp.task('clean-images', function() {
+    return gulp.src(path.dist + 'images')
+        .pipe(clean())
+})
+
+gulp.task('clean-css', function() {
+    return gulp.src(path.dist + 'css')
+        .pipe(clean())
+})
+
+gulp.task('clean-js', function() {
+    return gulp.src(path.dist + 'js')
+        .pipe(clean())
+})
+
 gulp.task('watch', function(callback) {
     runsequence('clean', 'html', 'css', 'js', 'images', 'browsersync', callback);
-    gulp.watch(path.src + 'scss/**/*.scss', ['css']);
+    gulp.watch(path.src + 'scss/**/*.scss', ['clean-css', 'css']);
     gulp.watch(path.src + '**/*.html', ['html']);
-    gulp.watch(path.src + 'js/**/*.js', ['js']);
+    gulp.watch(path.src + 'js/**/*.js', ['clean-js', 'js']);
+	gulp.watch(path.src + 'images/*', ['clean-images', 'images']);
 });
 
 gulp.task('default', ['watch']);
