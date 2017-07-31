@@ -2,6 +2,7 @@
   "name": "gulp-starter",
   "version": "1.0.0",
   "description": "Gulp starter kit for building a static site.",
+  "repository": "https://github.com/ryanlloydfrench/gulp-starter",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
