@@ -11,6 +11,7 @@ const rename = require('gulp-rename');
 const htmlmin = require('gulp-htmlmin');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
+const imagemin = require('gulp-imagemin');
 
 const paths = {
     src: 'src/**/*',
@@ -18,6 +19,7 @@ const paths = {
     srcCSS: 'src/**/*.css',
     srcSCSS: 'src/**/*.scss',
     srcJS: 'src/**/*.js',
+    srcIMAGES: 'src/**/*.+(png|jpg|gif|svg)',
     tmp: 'tmp',
     tmpHTML: 'tmp/index.html',
     tmpCSS: 'tmp/**/*.css',
@@ -46,7 +48,7 @@ gulp.task('html:dist', function () {
 gulp.task('css', function () {
     return gulp.src(paths.srcSCSS)
         .pipe(sourcemaps.init())
-        .pipe(sass())
+        .pipe(sass({outputStyle: 'expanded'}))
         .pipe(autoprefixer({browsers: ['last 2 versions'],cascade: false}))
         .pipe(sourcemaps.write('sourcemaps'))
         .pipe(gulp.dest(paths.tmp))
@@ -81,9 +83,27 @@ gulp.task('js:dist', function () {
         .pipe(notify({message: 'Compiled JS', onLast: 'true'}))
 });
 
-gulp.task('copy', ['html', 'css', 'js']);
+gulp.task('images', function () {
+    return gulp.src(paths.srcIMAGES)
+        .pipe(gulp.dest(paths.tmp))
+        .pipe(notify({message: 'Compiled Images', onLast: 'true'}))
+});
 
-gulp.task('copy:dist', ['html:dist', 'css:dist', 'js:dist']);
+gulp.task('images:dist', function () {
+    return gulp.src(paths.srcIMAGES)
+        .pipe(imagemin([
+            imagemin.gifsicle({interlaced: true}),
+            imagemin.jpegtran({progressive: true}),
+            imagemin.optipng({optimizationLevel: 3}),
+            imagemin.svgo({plugins: [{removeViewBox: true}]})
+        ]))
+        .pipe(gulp.dest(paths.dist))
+        .pipe(notify({message: 'Compiled Images', onLast: 'true'}))
+});
+
+gulp.task('copy', ['html', 'css', 'js', 'images']);
+
+gulp.task('copy:dist', ['html:dist', 'css:dist', 'js:dist', 'images:dist']);
 
 gulp.task('inject', ['copy'], function () {
     const css = gulp.src(paths.tmpCSS);
