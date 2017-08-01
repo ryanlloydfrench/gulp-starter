@@ -8,6 +8,7 @@ const sourcemaps = require('gulp-sourcemaps');
 const autoprefixer = require('gulp-autoprefixer');
 const cssnano = require('gulp-cssnano');
 const rename = require('gulp-rename');
+const htmlmin = require('gulp-htmlmin');
 
 const paths = {
     src: 'src/**/*',
@@ -27,12 +28,17 @@ const paths = {
 
 gulp.task('html', function () {
     return gulp.src(paths.srcHTML)
-        .pipe(gulp.dest(paths.tmp));
+        .pipe(gulp.dest(paths.tmp))
+        .pipe(browsersync.reload({stream: true}))
+        .pipe(notify({message: 'Compiled HTML', onLast: 'true'}))
 });
 
 gulp.task('html:dist', function () {
     return gulp.src(paths.srcHTML)
-        .pipe(gulp.dest(paths.dist));
+        .pipe(htmlmin({collapseWhitespace: true}))
+        .pipe(gulp.dest(paths.dist))
+        .pipe(browsersync.reload({stream: true}))
+        .pipe(notify({message: 'Compiled HTML', onLast: 'true'}))
 });
 
 gulp.task('css', function () {
