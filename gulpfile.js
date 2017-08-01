@@ -1,105 +1,98 @@
 const gulp = require('gulp');
-const htmlmin = require('gulp-htmlmin');
-const sass = require('gulp-sass');
-const sourcemaps = require('gulp-sourcemaps');
-const autoprefixer = require('gulp-autoprefixer');
-const cssnano = require('gulp-cssnano');
-const uglify = require('gulp-uglify');
-const rename = require('gulp-rename');
-const concat = require('gulp-concat');
+const inject = require('gulp-inject');
 const browsersync = require('browser-sync').create();
-const imagemin = require('gulp-imagemin');
-const newer = require('gulp-newer');
-const size = require('gulp-size');
 const clean = require('gulp-clean');
-const runsequence = require('run-sequence');
-const notify = require("gulp-notify");
 
-const path = {
-	src: 'src/',
-	dist: 'dist/'
+const paths = {
+    src: 'src/**/*',
+    srcHTML: 'src/**/*.html',
+    srcCSS: 'src/**/*.css',
+    srcJS: 'src/**/*.js',
+    tmp: 'tmp',
+    tmpHTML: 'tmp/index.html',
+    tmpCSS: 'tmp/**/*.css',
+    tmpJS: 'tmp/**/*.js',
+    dist: 'dist',
+    distHTML: 'dist/index.html',
+    distCSS: 'dist/**/*.css',
+    distJS: 'dist/**/*.js'
 };
 
-gulp.task('css', function() {
-    return gulp.src(path.src + 'scss/**/*.scss')
-        .pipe(sourcemaps.init())
-        .pipe(sass())
-        .pipe(autoprefixer({browsers: ['last 2 versions'],cascade: false}))
-        .pipe(cssnano())
-        .pipe(rename({suffix: '.min'}))
-        .pipe(sourcemaps.write('sourcemaps'))
-        .pipe(gulp.dest(path.dist + 'css'))
-        .pipe(browsersync.reload({stream: true}))
-		.pipe(size({ gzip: true, showFiles: true }))
-        .pipe(notify({message: 'Compiled CSS', onLast: 'true'}))
+gulp.task('html', function () {
+    return gulp.src(paths.srcHTML)
+        .pipe(gulp.dest(paths.tmp));
 });
 
-gulp.task('html', function() {
-    return gulp.src(path.src + '**/*.html')
-        .pipe(htmlmin({removeComments: true,collapseWhitespace: true}))
-        .pipe(gulp.dest(path.dist))
-        .pipe(browsersync.reload({stream: true}))
-		.pipe(size({ gzip: true, showFiles: true }))
-        .pipe(notify({message: 'Compiled HTML', onLast: 'true'}))
+gulp.task('html:dist', function () {
+    return gulp.src(paths.srcHTML)
+        .pipe(gulp.dest(paths.dist));
 });
 
-gulp.task('js', function() {
-    return gulp.src(path.src + 'js/**/*.js')
-        .pipe(concat('scripts.js'))
-        .pipe(rename({suffix: '.min'}))
-        .pipe(uglify())
-        .pipe(gulp.dest(path.dist + 'js'))
-		.pipe(size({ gzip: true, showFiles: true }))
-        .pipe(notify({message: 'Compiled JS', onLast: 'true'}))
+gulp.task('css', function () {
+    return gulp.src(paths.srcCSS)
+        .pipe(gulp.dest(paths.tmp));
 });
 
-gulp.task('browsersync', function() {
+gulp.task('css:dist', function () {
+    return gulp.src(paths.srcCSS)
+        .pipe(gulp.dest(paths.dist));
+});
+
+gulp.task('js', function () {
+    return gulp.src(paths.srcJS)
+        .pipe(gulp.dest(paths.tmp));
+});
+
+gulp.task('js:dist', function () {
+    return gulp.src(paths.srcJS)
+        .pipe(gulp.dest(paths.dist));
+});
+
+gulp.task('copy', ['html', 'css', 'js']);
+
+gulp.task('copy:dist', ['html:dist', 'css:dist', 'js:dist']);
+
+gulp.task('inject', ['copy'], function () {
+    const css = gulp.src(paths.tmpCSS);
+    const js = gulp.src(paths.tmpJS);
+    return gulp.src(paths.tmpHTML)
+        .pipe(inject( css, { relative:true } ))
+        .pipe(inject( js, { relative:true } ))
+        .pipe(gulp.dest(paths.tmp));
+});
+
+gulp.task('inject:dist', ['copy:dist'], function () {
+    const css = gulp.src(paths.distCSS);
+    const js = gulp.src(paths.distJS);
+    return gulp.src(paths.distHTML)
+        .pipe(inject( css, { relative:true } ))
+        .pipe(inject( js, { relative:true } ))
+        .pipe(gulp.dest(paths.dist));
+});
+
+gulp.task('browsersync', ['inject'], function() {
     browsersync.init({
         server: {
-            baseDir: path.dist
+            baseDir: paths.tmp
         },
         open: false
     })
 })
 
-gulp.task('images', function() {
-    return gulp.src(path.src + 'images/**/*.+(png|jpg|gif|svg)')
-        .pipe(imagemin([
-            imagemin.gifsicle({interlaced: true}),
-            imagemin.jpegtran({progressive: true}),
-            imagemin.optipng({optimizationLevel: 3}),
-            imagemin.svgo({plugins: [{removeViewBox: true}]})
-        ]))
-        .pipe(gulp.dest(path.dist + 'images'))
-        .pipe(notify({message: 'Compiled Images', onLast: 'true'}))
-})
-
-gulp.task('clean', function() {
-    return gulp.src(path.dist)
+gulp.task('clean:tmp', function () {
+    return gulp.src(paths.tmp)
         .pipe(clean())
-})
-
-gulp.task('clean-images', function() {
-    return gulp.src(path.dist + 'images')
-        .pipe(clean())
-})
-
-gulp.task('clean-css', function() {
-    return gulp.src(path.dist + 'css')
-        .pipe(clean())
-})
-
-gulp.task('clean-js', function() {
-    return gulp.src(path.dist + 'js')
-        .pipe(clean())
-})
-
-gulp.task('watch', function(callback) {
-    runsequence('clean', 'html', 'css', 'js', 'images', 'browsersync', callback);
-    gulp.watch(path.src + 'scss/**/*.scss', ['clean-css', 'css']);
-    gulp.watch(path.src + '**/*.html', ['html']);
-    gulp.watch(path.src + 'js/**/*.js', ['clean-js', 'js']);
-	gulp.watch(path.src + 'images/*', ['clean-images', 'images']);
 });
+
+gulp.task('clean:dist', function () {
+    return gulp.src(paths.dist)
+        .pipe(clean())
+});
+
+gulp.task('watch', ['browsersync'], function () {
+    gulp.watch(paths.src, ['inject']);
+});
+
+gulp.task('build', ['inject:dist']);
 
 gulp.task('default', ['watch']);
