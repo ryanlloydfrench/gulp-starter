@@ -12,6 +12,7 @@ const htmlmin = require('gulp-htmlmin');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const imagemin = require('gulp-imagemin');
+const size = require('gulp-size');
 
 const paths = {
     src: 'src/**/*',
@@ -42,6 +43,7 @@ gulp.task('html:dist', function () {
         .pipe(htmlmin({collapseWhitespace: true}))
         .pipe(gulp.dest(paths.dist))
         .pipe(browsersync.reload({stream: true}))
+        .pipe(size({ gzip: true, showFiles: true }))
         .pipe(notify({message: 'Compiled HTML', onLast: 'true'}))
 });
 
@@ -63,6 +65,7 @@ gulp.task('css:dist', function () {
         .pipe(cssnano())
         .pipe(rename({suffix: '.min'}))
         .pipe(gulp.dest(paths.dist))
+        .pipe(size({ gzip: true, showFiles: true }))
         .pipe(notify({message: 'Compiled CSS', onLast: 'true'}))
 });
 
@@ -80,6 +83,7 @@ gulp.task('js:dist', function () {
         .pipe(rename({suffix: '.min'}))
         .pipe(uglify())
         .pipe(gulp.dest(paths.dist + '/js'))
+        .pipe(size({ gzip: true, showFiles: true }))
         .pipe(notify({message: 'Compiled JS', onLast: 'true'}))
 });
 
