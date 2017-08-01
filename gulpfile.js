@@ -1,7 +1,8 @@
 const gulp = require('gulp');
 const inject = require('gulp-inject');
 const browsersync = require('browser-sync').create();
-const clean = require('gulp-clean');
+const del = require('del');
+const sequence = require('gulp-sequence');
 const notify = require("gulp-notify");
 const sass = require('gulp-sass');
 const sourcemaps = require('gulp-sourcemaps');
@@ -137,19 +138,20 @@ gulp.task('browsersync', ['inject'], function() {
 })
 
 gulp.task('clean:tmp', function () {
-    return gulp.src(paths.tmp)
-        .pipe(clean())
+    del.sync([paths.tmp]);
 });
 
 gulp.task('clean:dist', function () {
-    return gulp.src(paths.dist)
-        .pipe(clean())
+    del.sync([paths.dist]);
 });
 
-gulp.task('watch', ['browsersync'], function () {
+gulp.task('watch', function (callback) {
+    sequence('clean:tmp', ['browsersync'], callback)
     gulp.watch(paths.src, ['inject']);
 });
 
-gulp.task('build', ['inject:dist']);
+gulp.task('build', function (callback) {
+    sequence('clean:dist', ['inject:dist'], callback)
+});
 
 gulp.task('default', ['watch']);
