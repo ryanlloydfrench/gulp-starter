@@ -9,6 +9,8 @@ const autoprefixer = require('gulp-autoprefixer');
 const cssnano = require('gulp-cssnano');
 const rename = require('gulp-rename');
 const htmlmin = require('gulp-htmlmin');
+const concat = require('gulp-concat');
+const uglify = require('gulp-uglify');
 
 const paths = {
     src: 'src/**/*',
@@ -64,12 +66,19 @@ gulp.task('css:dist', function () {
 
 gulp.task('js', function () {
     return gulp.src(paths.srcJS)
-        .pipe(gulp.dest(paths.tmp));
+        .pipe(concat('script.js'))
+        .pipe(gulp.dest(paths.tmp + '/js'))
+        .pipe(browsersync.reload({stream: true}))
+        .pipe(notify({message: 'Compiled JS', onLast: 'true'}))
 });
 
 gulp.task('js:dist', function () {
     return gulp.src(paths.srcJS)
-        .pipe(gulp.dest(paths.dist));
+        .pipe(concat('script.js'))
+        .pipe(rename({suffix: '.min'}))
+        .pipe(uglify())
+        .pipe(gulp.dest(paths.dist + '/js'))
+        .pipe(notify({message: 'Compiled JS', onLast: 'true'}))
 });
 
 gulp.task('copy', ['html', 'css', 'js']);
