@@ -35,7 +35,6 @@ const paths = {
 gulp.task('html', function () {
     return gulp.src(paths.srcHTML)
         .pipe(gulp.dest(paths.tmp))
-        .pipe(browsersync.reload({stream: true}))
         .pipe(notify({message: 'Compiled HTML', onLast: 'true'}))
 });
 
@@ -43,7 +42,6 @@ gulp.task('html:dist', function () {
     return gulp.src(paths.srcHTML)
         .pipe(htmlmin({collapseWhitespace: true}))
         .pipe(gulp.dest(paths.dist))
-        .pipe(browsersync.reload({stream: true}))
         .pipe(size({ gzip: true, showFiles: true }))
         .pipe(notify({message: 'Compiled HTML', onLast: 'true'}))
 });
@@ -55,7 +53,6 @@ gulp.task('css', function () {
         .pipe(autoprefixer({browsers: ['last 2 versions'],cascade: false}))
         .pipe(sourcemaps.write('sourcemaps'))
         .pipe(gulp.dest(paths.tmp))
-        .pipe(browsersync.reload({stream: true}))
         .pipe(notify({message: 'Compiled CSS', onLast: 'true'}))
 });
 
@@ -74,7 +71,6 @@ gulp.task('js', function () {
     return gulp.src(paths.srcJS)
         .pipe(concat('script.js'))
         .pipe(gulp.dest(paths.tmp + '/js'))
-        .pipe(browsersync.reload({stream: true}))
         .pipe(notify({message: 'Compiled JS', onLast: 'true'}))
 });
 
@@ -116,7 +112,8 @@ gulp.task('inject', ['copy'], function () {
     return gulp.src(paths.tmpHTML)
         .pipe(inject( css, { relative:true } ))
         .pipe(inject( js, { relative:true } ))
-        .pipe(gulp.dest(paths.tmp));
+        .pipe(gulp.dest(paths.tmp))
+        .pipe(browsersync.stream())
 });
 
 gulp.task('inject:dist', ['copy:dist'], function () {
@@ -125,7 +122,7 @@ gulp.task('inject:dist', ['copy:dist'], function () {
     return gulp.src(paths.distHTML)
         .pipe(inject( css, { relative:true } ))
         .pipe(inject( js, { relative:true } ))
-        .pipe(gulp.dest(paths.dist));
+        .pipe(gulp.dest(paths.dist))
 });
 
 gulp.task('browsersync', ['inject'], function() {
