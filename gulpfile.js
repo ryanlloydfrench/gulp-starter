@@ -2,11 +2,18 @@ const gulp = require('gulp');
 const inject = require('gulp-inject');
 const browsersync = require('browser-sync').create();
 const clean = require('gulp-clean');
+const notify = require("gulp-notify");
+const sass = require('gulp-sass');
+const sourcemaps = require('gulp-sourcemaps');
+const autoprefixer = require('gulp-autoprefixer');
+const cssnano = require('gulp-cssnano');
+const rename = require('gulp-rename');
 
 const paths = {
     src: 'src/**/*',
     srcHTML: 'src/**/*.html',
     srcCSS: 'src/**/*.css',
+    srcSCSS: 'src/**/*.scss',
     srcJS: 'src/**/*.js',
     tmp: 'tmp',
     tmpHTML: 'tmp/index.html',
@@ -29,13 +36,24 @@ gulp.task('html:dist', function () {
 });
 
 gulp.task('css', function () {
-    return gulp.src(paths.srcCSS)
-        .pipe(gulp.dest(paths.tmp));
+    return gulp.src(paths.srcSCSS)
+        .pipe(sourcemaps.init())
+        .pipe(sass())
+        .pipe(autoprefixer({browsers: ['last 2 versions'],cascade: false}))
+        .pipe(sourcemaps.write('sourcemaps'))
+        .pipe(gulp.dest(paths.tmp))
+        .pipe(browsersync.reload({stream: true}))
+        .pipe(notify({message: 'Compiled CSS', onLast: 'true'}))
 });
 
 gulp.task('css:dist', function () {
-    return gulp.src(paths.srcCSS)
-        .pipe(gulp.dest(paths.dist));
+    return gulp.src(paths.srcSCSS)
+        .pipe(sass())
+        .pipe(autoprefixer({browsers: ['last 2 versions'],cascade: false}))
+        .pipe(cssnano())
+        .pipe(rename({suffix: '.min'}))
+        .pipe(gulp.dest(paths.dist))
+        .pipe(notify({message: 'Compiled CSS', onLast: 'true'}))
 });
 
 gulp.task('js', function () {
