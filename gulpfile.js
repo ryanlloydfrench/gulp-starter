@@ -130,7 +130,8 @@ gulp.task('browsersync', ['inject'], function() {
         server: {
             baseDir: paths.tmp
         },
-        open: false
+        open: false,
+        notify: false
     })
 })
 
