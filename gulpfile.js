@@ -14,9 +14,12 @@ const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const imagemin = require('gulp-imagemin');
 const size = require('gulp-size');
+const rev = require('gulp-rev');
+const revReplace = require('gulp-rev-replace');
 
 const paths = {
-    src: 'src/**/*',
+    src: 'src',
+    srcFILES: 'src/**/*',
     srcHTML: 'src/**/*.html',
     srcCSS: 'src/**/*.css',
     srcSCSS: 'src/**/*.scss',
@@ -106,6 +109,21 @@ gulp.task('copy', ['html', 'css', 'js', 'images']);
 
 gulp.task('copy:dist', ['html:dist', 'css:dist', 'js:dist', 'images:dist']);
 
+gulp.task("revision:dist", ['copy:dist'], function(){
+    return gulp.src([paths.distCSS, paths.distJS])
+        .pipe(rev())
+        .pipe(gulp.dest(paths.dist))
+        .pipe(rev.manifest())
+        .pipe(gulp.dest(paths.dist))
+})
+
+gulp.task("revreplace:dist", ["revision:dist"], function(){
+    const manifest = gulp.src(paths.dist + "/rev-manifest.json");
+    return gulp.src(paths.dist + "/index.html")
+        .pipe(revReplace({manifest: manifest}))
+        .pipe(gulp.dest(paths.dist));
+});
+
 gulp.task('inject', ['copy'], function () {
     const css = gulp.src(paths.tmpCSS);
     const js = gulp.src(paths.tmpJS);
@@ -116,7 +134,7 @@ gulp.task('inject', ['copy'], function () {
         .pipe(browsersync.stream())
 });
 
-gulp.task('inject:dist', ['copy:dist'], function () {
+gulp.task('inject:dist', ['revreplace:dist'], function () {
     const css = gulp.src(paths.distCSS);
     const js = gulp.src(paths.distJS);
     return gulp.src(paths.distHTML)
@@ -145,7 +163,7 @@ gulp.task('clean:dist', function () {
 
 gulp.task('watch', function (callback) {
     sequence('clean:tmp', ['browsersync'], callback)
-    gulp.watch(paths.src, ['inject']);
+    gulp.watch(paths.srcFILES, ['inject']);
 });
 
 gulp.task('build', function (callback) {
