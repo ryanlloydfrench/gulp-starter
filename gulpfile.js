@@ -39,6 +39,16 @@ const paths = {
     distJS: 'dist/**/*.js'
 };
 
+gulp.task('allfiles', function () {
+    return gulp.src([paths.srcFILES, '!src/scss', '!src/scss/**/*', '!src/js', '!src/js/**/*', '!src/partials', '!src/partials/**/*', '!src/images', '!src/images/**/*'])
+        .pipe(gulp.dest(paths.tmp))
+});
+
+gulp.task('allfiles:dist', function () {
+    return gulp.src([paths.srcFILES, '!src/scss', '!src/scss/**/*', '!src/js', '!src/js/**/*', '!src/partials', '!src/partials/**/*', '!src/images', '!src/images/**/*'])
+        .pipe(gulp.dest(paths.dist))
+});
+
 gulp.task('html', function () {
     const options = {
         ignorePartials: true,
@@ -120,9 +130,9 @@ gulp.task('images:dist', function () {
         .pipe(notify({message: 'Compiled Images', onLast: 'true'}))
 });
 
-gulp.task('copy', ['html', 'css', 'js', 'images']);
+gulp.task('copy', ['allfiles', 'html', 'css', 'js', 'images']);
 
-gulp.task('copy:dist', ['html:dist', 'css:dist', 'js:dist', 'images:dist']);
+gulp.task('copy:dist', ['allfiles:dist','html:dist', 'css:dist', 'js:dist', 'images:dist']);
 
 gulp.task("revision:dist", ['copy:dist'], function(){
     return gulp.src([paths.distCSS, paths.distJS])
