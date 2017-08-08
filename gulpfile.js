@@ -112,7 +112,7 @@ gulp.task('images:dist', function () {
             imagemin.jpegtran({progressive: true}),
             imagemin.optipng({optimizationLevel: 3}),
             imagemin.svgo({plugins: [{removeViewBox: true}]})
-        ]))
+        ],{verbose: true}))
         .pipe(gulp.dest(paths.dist))
         .pipe(notify({message: 'Compiled Images', onLast: 'true'}))
 });
