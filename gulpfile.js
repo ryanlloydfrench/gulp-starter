@@ -16,6 +16,7 @@ const imagemin = require('gulp-imagemin');
 const size = require('gulp-size');
 const rev = require('gulp-rev');
 const revReplace = require('gulp-rev-replace');
+const revdel = require('gulp-rev-delete-original');
 const handlebars = require('gulp-compile-handlebars');
 
 const paths = {
@@ -123,6 +124,7 @@ gulp.task('copy:dist', ['html:dist', 'css:dist', 'js:dist', 'images:dist']);
 gulp.task("revision:dist", ['copy:dist'], function(){
     return gulp.src([paths.distCSS, paths.distJS])
         .pipe(rev())
+        .pipe(revdel())
         .pipe(gulp.dest(paths.dist))
         .pipe(rev.manifest())
         .pipe(gulp.dest(paths.dist))
