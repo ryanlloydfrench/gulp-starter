@@ -4,20 +4,20 @@ const browsersync = require('browser-sync').create();
 const del = require('del');
 const sequence = require('gulp-sequence');
 const notify = require("gulp-notify");
+const size = require('gulp-size');
+const rename = require('gulp-rename');
+const htmlmin = require('gulp-htmlmin');
+const handlebars = require('gulp-compile-handlebars');
 const sass = require('gulp-sass');
 const sourcemaps = require('gulp-sourcemaps');
 const autoprefixer = require('gulp-autoprefixer');
 const cssnano = require('gulp-cssnano');
-const rename = require('gulp-rename');
-const htmlmin = require('gulp-htmlmin');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
-const imagemin = require('gulp-imagemin');
-const size = require('gulp-size');
 const rev = require('gulp-rev');
 const revReplace = require('gulp-rev-replace');
 const revdel = require('gulp-rev-delete-original');
-const handlebars = require('gulp-compile-handlebars');
+const imagemin = require('gulp-imagemin');
 
 const paths = {
     src: 'src',
@@ -134,7 +134,7 @@ gulp.task("revreplace:dist", ["revision:dist"], function(){
     const manifest = gulp.src(paths.dist + "/rev-manifest.json");
     return gulp.src(paths.dist + "/index.html")
         .pipe(revReplace({manifest: manifest}))
-        .pipe(gulp.dest(paths.dist));
+        .pipe(gulp.dest(paths.dist))
 });
 
 gulp.task('inject', ['copy'], function () {
@@ -167,16 +167,16 @@ gulp.task('browsersync', ['inject'], function() {
 })
 
 gulp.task('clean:tmp', function () {
-    del.sync([paths.tmp]);
+    del.sync([paths.tmp])
 });
 
 gulp.task('clean:dist', function () {
-    del.sync([paths.dist]);
+    del.sync([paths.dist])
 });
 
 gulp.task('watch', function (callback) {
     sequence('clean:tmp', ['browsersync'], callback)
-    gulp.watch(paths.srcFILES, ['inject']);
+    gulp.watch(paths.srcFILES, ['inject'])
 });
 
 gulp.task('build', function (callback) {
