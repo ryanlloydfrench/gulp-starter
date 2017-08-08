@@ -5,6 +5,7 @@ const del = require('del');
 const sequence = require('gulp-sequence');
 const notify = require("gulp-notify");
 const size = require('gulp-size');
+const sizereport = require('gulp-sizereport');
 const rename = require('gulp-rename');
 const htmlmin = require('gulp-htmlmin');
 const handlebars = require('gulp-compile-handlebars');
@@ -172,6 +173,11 @@ gulp.task('clean:tmp', function () {
 
 gulp.task('clean:dist', function () {
     del.sync([paths.dist])
+});
+
+gulp.task('sizereport', function () {
+	return gulp.src(paths.dist + '/**/*')
+		.pipe(sizereport());
 });
 
 gulp.task('watch', function (callback) {
