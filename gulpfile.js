@@ -179,7 +179,7 @@ gulp.task('browsersync', ['inject'], function() {
     })
 })
 
-gulp.task('clean:tmp', function () {
+gulp.task('clean', function () {
     del.sync([paths.tmp])
 });
 
@@ -193,7 +193,7 @@ gulp.task('sizereport', function () {
 });
 
 gulp.task('watch', function (callback) {
-    sequence('clean:tmp', ['browsersync'], callback)
+    sequence('clean', ['browsersync'], callback)
     gulp.watch(paths.srcFILES, ['inject'])
 });
 
