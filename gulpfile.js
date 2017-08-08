@@ -16,6 +16,7 @@ const imagemin = require('gulp-imagemin');
 const size = require('gulp-size');
 const rev = require('gulp-rev');
 const revReplace = require('gulp-rev-replace');
+const handlebars = require('gulp-compile-handlebars');
 
 const paths = {
     src: 'src',
@@ -36,7 +37,12 @@ const paths = {
 };
 
 gulp.task('html', function () {
+    const options = {
+        ignorePartials: true,
+        batch : [paths.src + '/partials']
+    }
     return gulp.src(paths.srcHTML)
+        .pipe(handlebars('',options))
         .pipe(gulp.dest(paths.tmp))
         .pipe(notify({message: 'Compiled HTML', onLast: 'true'}))
 });
