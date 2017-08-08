@@ -48,7 +48,12 @@ gulp.task('html', function () {
 });
 
 gulp.task('html:dist', function () {
+    const options = {
+        ignorePartials: true,
+        batch : [paths.src + '/partials']
+    }
     return gulp.src(paths.srcHTML)
+        .pipe(handlebars('',options))
         .pipe(htmlmin({collapseWhitespace: true}))
         .pipe(gulp.dest(paths.dist))
         .pipe(size({ gzip: true, showFiles: true }))
