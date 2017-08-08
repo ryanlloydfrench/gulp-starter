@@ -13,6 +13,7 @@ const sass = require('gulp-sass');
 const sourcemaps = require('gulp-sourcemaps');
 const autoprefixer = require('gulp-autoprefixer');
 const cssnano = require('gulp-cssnano');
+const uncss = require('gulp-uncss');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const rev = require('gulp-rev');
@@ -76,6 +77,7 @@ gulp.task('css:dist', function () {
     return gulp.src(paths.srcSCSS)
         .pipe(sass())
         .pipe(autoprefixer({browsers: ['last 2 versions'],cascade: false}))
+        .pipe(uncss({html: ['src/index.html']}))
         .pipe(cssnano())
         .pipe(rename({suffix: '.min'}))
         .pipe(gulp.dest(paths.dist))
