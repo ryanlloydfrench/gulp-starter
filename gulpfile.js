@@ -25,16 +25,15 @@ const paths = {
     src: 'src',
     srcFILES: 'src/**/*',
     srcHTML: 'src/**/*.html',
-    srcCSS: 'src/**/*.css',
-    srcSCSS: 'src/**/*.scss',
-    srcJS: 'src/**/*.js',
-    srcIMAGES: 'src/**/*.+(png|jpg|gif|svg)',
+    srcCSS: 'src/scss/**/*.scss',
+    srcJS: 'src/js/**/*.js',
+    srcIMAGES: 'src/images/**/*.+(png|jpg|gif|svg)',
     tmp: 'tmp',
     tmpHTML: 'tmp/index.html',
-    tmpCSS: 'tmp/**/*.css',
-    tmpJS: 'tmp/**/*.js',
+    tmpCSS: 'tmp/css/**/*.css',
+    tmpJS: 'tmp/js/**/*.js',
     dist: 'dist',
-    distHTML: 'dist/index.html',
+    distHTML: 'dist/**/*.html',
     distCSS: 'dist/**/*.css',
     distJS: 'dist/**/*.js'
 };
@@ -67,6 +66,11 @@ gulp.task('html:dist', function () {
     }
     return gulp.src(paths.srcHTML)
         .pipe(handlebars('',options))
+        .pipe(gulp.dest(paths.dist))
+});
+
+gulp.task('htmlmin:dist', ['html:dist'], function () {
+    return gulp.src(paths.distHTML)
         .pipe(htmlmin({collapseWhitespace: true}))
         .pipe(gulp.dest(paths.dist))
         .pipe(size({ gzip: true, showFiles: true }))
@@ -74,23 +78,23 @@ gulp.task('html:dist', function () {
 });
 
 gulp.task('css', function () {
-    return gulp.src(paths.srcSCSS)
+    return gulp.src(paths.srcCSS)
         .pipe(sourcemaps.init())
         .pipe(sass({outputStyle: 'expanded'}))
         .pipe(autoprefixer({browsers: ['last 2 versions'],cascade: false}))
         .pipe(sourcemaps.write('sourcemaps'))
-        .pipe(gulp.dest(paths.tmp))
+        .pipe(gulp.dest(paths.tmp + '/css'))
         .pipe(notify({message: 'Compiled CSS', onLast: 'true'}))
 });
 
 gulp.task('css:dist', function () {
-    return gulp.src(paths.srcSCSS)
+    return gulp.src(paths.srcCSS)
         .pipe(sass())
         .pipe(autoprefixer({browsers: ['last 2 versions'],cascade: false}))
         .pipe(uncss({html: ['src/index.html']}))
         .pipe(cssnano())
         .pipe(rename({suffix: '.min'}))
-        .pipe(gulp.dest(paths.dist))
+        .pipe(gulp.dest(paths.dist + '/css'))
         .pipe(size({ gzip: true, showFiles: true }))
         .pipe(notify({message: 'Compiled CSS', onLast: 'true'}))
 });
@@ -114,7 +118,7 @@ gulp.task('js:dist', function () {
 
 gulp.task('images', function () {
     return gulp.src(paths.srcIMAGES)
-        .pipe(gulp.dest(paths.tmp))
+        .pipe(gulp.dest(paths.tmp + '/images'))
         .pipe(notify({message: 'Compiled Images', onLast: 'true'}))
 });
 
@@ -126,13 +130,13 @@ gulp.task('images:dist', function () {
             imagemin.optipng({optimizationLevel: 3}),
             imagemin.svgo({plugins: [{removeViewBox: true}]})
         ],{verbose: true}))
-        .pipe(gulp.dest(paths.dist))
+        .pipe(gulp.dest(paths.dist + '/images'))
         .pipe(notify({message: 'Compiled Images', onLast: 'true'}))
 });
 
 gulp.task('copy', ['allfiles', 'html', 'css', 'js', 'images']);
 
-gulp.task('copy:dist', ['allfiles:dist','html:dist', 'css:dist', 'js:dist', 'images:dist']);
+gulp.task('copy:dist', ['allfiles:dist','htmlmin:dist', 'css:dist', 'js:dist', 'images:dist']);
 
 gulp.task("revision:dist", ['copy:dist'], function(){
     return gulp.src([paths.distCSS, paths.distJS])
