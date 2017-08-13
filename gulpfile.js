@@ -91,7 +91,7 @@ gulp.task('css:dist', function () {
     return gulp.src(paths.srcCSS)
         .pipe(sass())
         .pipe(autoprefixer({browsers: ['last 2 versions'],cascade: false}))
-        .pipe(uncss({html: ['src/index.html']}))
+        .pipe(uncss({html: [paths.srcHTML]}))
         .pipe(cssnano())
         .pipe(rename({suffix: '.min'}))
         .pipe(gulp.dest(paths.dist + '/css'))
