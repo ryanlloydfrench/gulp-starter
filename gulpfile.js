@@ -20,6 +20,7 @@ const rev = require('gulp-rev');
 const revReplace = require('gulp-rev-replace');
 const revdel = require('gulp-rev-delete-original');
 const imagemin = require('gulp-imagemin');
+const githubpages = require('gulp-gh-pages');
 
 const paths = {
     src: 'src',
@@ -194,6 +195,12 @@ gulp.task('clean:dist', function () {
 gulp.task('sizereport', function () {
 	return gulp.src(paths.dist + '/**/*')
 		.pipe(sizereport());
+});
+
+gulp.task('deploy', ['build'], function() {
+    return gulp.src(paths.dist + '/**/*')
+        .pipe(githubpages())
+        .pipe(notify({message: 'Deployed Website', onLast: 'true'}))
 });
 
 gulp.task('watch', function (callback) {
