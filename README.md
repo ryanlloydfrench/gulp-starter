@@ -6,6 +6,7 @@ Super simple starter kit for building a static site with Gulp.
 2. run `npm i`
 
 ### Tasks
-- development server: run `gulp`
+- development: run `gulp`
 - build: run `gulp build`
-- size report of build: run `gulp sizereport`
+- deploy: run `gulp deploy`
+- size report: run `gulp sizereport`
