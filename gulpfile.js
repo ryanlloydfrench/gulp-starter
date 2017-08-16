@@ -139,7 +139,7 @@ gulp.task('copy', ['allfiles', 'html', 'css', 'js', 'images']);
 
 gulp.task('copy:dist', ['allfiles:dist','htmlmin:dist', 'css:dist', 'js:dist', 'images:dist']);
 
-gulp.task("revision:dist", ['copy:dist'], function(){
+gulp.task("revision:dist", ['copy:dist'], function() {
     return gulp.src([paths.distCSS, paths.distJS])
         .pipe(rev())
         .pipe(revdel())
@@ -148,7 +148,7 @@ gulp.task("revision:dist", ['copy:dist'], function(){
         .pipe(gulp.dest(paths.dist))
 })
 
-gulp.task("revreplace:dist", ["revision:dist"], function(){
+gulp.task("revreplace:dist", ["revision:dist"], function() {
     const manifest = gulp.src(paths.dist + "/rev-manifest.json");
     return gulp.src(paths.dist + "/index.html")
         .pipe(revReplace({manifest: manifest}))
